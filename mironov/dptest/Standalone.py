@@ -48,7 +48,7 @@ def train_standalone():
   to run the model, defined outside the DP tree, using config defined outside DP
   tree. """
 
-  config = parse_config("mironov/dptest/Model.json")
+  config = parse_config("mironov/dptest/Standalone.json")
 
   import_packages(config.get('metadata', {}).get('imports', []))
   data = read_data_by_config(config)
