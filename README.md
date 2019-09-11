@@ -38,6 +38,9 @@ The current setup mounts project's root directory into container's /home. It is
 thus possible to edit code using your favorite host's editor and compile it with
 CLI tools installed in the Docker container.
 
+_Note: Docker image presented here contains custom SSL certificates that we need
+in our regular work. Don't use this image for security-critical tasks!_
+
 Running the training example
 ----------------------------
 
