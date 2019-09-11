@@ -1,3 +1,3 @@
 Master commit at the time of publication:
 
-c95fc79 public, update publisher
+43c2bc9 DP, remove debug print, add __main__ handler
