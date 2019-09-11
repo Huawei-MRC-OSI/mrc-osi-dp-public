@@ -1,5 +1,5 @@
-DeepPavlov as standalone library
---------------------------------
+DeepPavlov as a library
+-----------------------
 
 In this repository we demonstrate how to re-use [DeepPavlov](https://deeppavlov.ai/)
 infrastructure for training custom NLP models.
@@ -23,13 +23,12 @@ the overall approach_
 Working with the repository
 ---------------------------
 
-We use Docker environment for tasks which require complex setup, such as
-training ML models. To open the development shell:
+We use Docker environment in this project. To open the development shell:
 
-0. Make sure you updated the Git-submodules: `git submodule update --init
+1. Download git-submodules with `git submodule update --init
    --recursive`.
-1. Run `rundocker.sh ./docker/mironov.docker [-n]`
-2. By default, docker image maps certain TCP ports to allow connecting to
+2. Run `rundocker.sh ./docker/mironov.docker [-n]`
+3. By default, docker image maps certain TCP ports to allow connecting to
    Jupyter or Tensorboard servers that may be run within the container (note,
    they have to be started explicitly).  `./rundocker.sh` accepts
    `--no-map-sockets|-n` flag to disable this feature e.g. to avoid port
@@ -46,27 +45,28 @@ Once you run docker image and enter development shell, you could do the
 following:
 
 1. To run the training example from the ipython, do the following
-  ```
-  $ ipython
-  > from dptest.StandaloneBERT import *
-  > run()
-  ```
+   ```
+   $ ipython
+   > from dptest.StandaloneBERT import *
+   > run()
+   ```
 
 2. Run the model training example using python
-  ```
-  $ python -m 'dptest.StandaloneBERT'
-  ```
+   ```
+   $ python -m 'dptest.StandaloneBERT'
+   ```
 
 Notes
 -----
 
-* [StandaloneBERT.json](./mironov/StandaloneBERT.json) declares the DeepPavlov
-  model configuration. Its main feature is `StandaloneBERT` component which
-  doesn't exist in stock DeepPavlov but is defined in [StandaloneBERT.py](./mironov/StandaloneBERT.py)
-  file.
-* [StandaloneBERT.py](./mironov/StandaloneBERT.py) defines the model wrapper and
-  a replacement for main function.
-* The Main function's logic is implemented by `load` and `train` functions. They loosely
+* [StandaloneBERT.json](./mironov/dptest/StandaloneBERT.json) declares the DeepPavlov
+  model configuration.
+  - `StandaloneBERT` is a custom component defined in
+    [StandaloneBERT.py](./mironov/StandaloneBERT.py) file.
+  - Other Chainer components are re-used.
+* [StandaloneBERT.py](./mironov/dptest/StandaloneBERT.py) defines the model wrapper and
+  its initialization.
+* The Main function's logic is implemented in `load` and `train` functions. They loosely
   follow the algorithm of DeepPavlov's `train_evaluate_model_from_config`, but
-  are shorter since we removed all it's irrelevant branches.
+  are shorter since we removed task-irrelevant branches.
 
