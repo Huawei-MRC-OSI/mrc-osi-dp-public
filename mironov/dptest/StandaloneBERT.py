@@ -38,6 +38,9 @@ log = getLogger(__name__)
 
 @register('StandaloneBERT')
 class StandaloneBERT(NNModel):
+  """ DeepPavlov Wrapper class for Keras-bert model. We follow the [Sentiment
+  example](https://github.com/CyberZHG/keras-bert/blob/master/demo/tune/keras_bert_classification_tpu.ipynb)
+  """
 
   def __init__(self, *args, **kwargs)->None:
     print('StandaloneBERT created', str(args), str(kwargs))
@@ -90,7 +93,6 @@ class StandaloneBERT(NNModel):
       self.load()
 
   def destroy(self)->None:
-    print('StandaloneBERT::destroy called')
     if hasattr(self,'model'):
       delattr(self,'model')
     super().destroy()
@@ -124,31 +126,21 @@ class StandaloneBERT(NNModel):
     return results.tolist()
 
   def process_event(self, event_name, data):
-    # print('StandaloneBERT::process_event called, event', event_name)
     pass
 
   def save(self, *args, **kwargs)->None:
-    print('StandaloneBERT::save')
-
     save_path = expand_path((self.save_path / self.name).with_suffix('.h5'))
-
-    print(f"Saving to {save_path}")
     save_path.parent.mkdir(parents=True, exist_ok=True)
-
     try:
       self.model.save_weights(str(save_path))
     except ValueError as err:
       log.warn(f"Failed to save model weights. Error is {err}")
 
   def load(self, *args, **kwargs)->None:
-    print('StandaloneBERT::load',)
-
     if self.load_path is None:
       raise RuntimeError(f'Load path is not set for {self.name}')
-
     load_path = expand_path((self.load_path / self.name).with_suffix('.h5'))
     print(f"Loading from {load_path}")
-
     try:
       self.model.load_weights(str(load_path))
     except ValueError as err:
@@ -157,34 +149,31 @@ class StandaloneBERT(NNModel):
       log.warn(f"Failed to load model weights. Error is {err}")
 
   def train_on_batch(self, *args, **kwargs):
+    """ DeepPavlov interface method for model training. """
     return self._train(*args, **kwargs)
 
   def __call__(self, *args, **kwargs):
+    """ DeepPavlov interface method for model inference. """
     return self._infer(*args, **kwargs)
 
-
-
-
 class DPModel:
+  """ Application state keeper class """
   iterator:Any
   data:Any
   config:Any
-  def __init__(self)->None:
-    pass
 
-def load(m:DPModel)->None:
+def load(m:DPModel)->DPModel:
+  """ State inisializer method """
   m.config = parse_config(os.environ.get('MRCNLP_ROOT','/workspace') + "/mironov/dptest/StandaloneBERT.json")
   deep_download(m.config)
-
   import_packages(m.config.get('metadata', {}).get('imports', []))
   m.data = read_data_by_config(m.config)
+  return m
 
-
-def train(m:DPModel):
-  """ Use the generic algorithm of `train_evaluate_model_from_config`, but
-  shrink its scope to the particular task-specific config. This should allow us
-  to run the model, defined outside the DP tree, using config defined outside DP
-  tree. """
+def train(m:DPModel)->dict:
+  """ Trainer routine.
+  Use the generic algorithm of `train_evaluate_model_from_config`, but
+  shrink its scope to the particular task-specific config."""
 
   m.iterator = get_iterator_from_config(m.config, m.data)
 
@@ -208,9 +197,12 @@ def train(m:DPModel):
   res = trainer.evaluate(m.iterator, eval_config, print_reports=True)
   return res
 
-def run()->None:
+def run()->DPModel:
+  """ Main routine """
   m=DPModel()
   load(m)
   train(m)
+  return m
 
-
+if __name__ == '__main__':
+  run()
