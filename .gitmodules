@@ -1,0 +1,9 @@
+[submodule "mironov/DeepPavlov"]
+	path = mironov/DeepPavlov
+	url = https://github.com/Huawei-MRC-OSI/DeepPavlov
+[submodule "mironov/keras-bert"]
+	path = mironov/keras-bert
+	url = https://github.com/CyberZHG/keras-bert
+[submodule "mironov/keras-radam"]
+	path = mironov/keras-radam
+	url = https://github.com/CyberZHG/keras-radam
