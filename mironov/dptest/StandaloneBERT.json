@@ -1,0 +1,102 @@
+{
+  "dataset_reader": {
+    "class_name": "imdb_reader",
+    "data_path": "{DOWNLOADS_PATH}/aclImdb"
+  },
+  "dataset_iterator": {
+    "class_name": "basic_classification_iterator",
+    "seed": 42,
+    "split_seed": 23,
+    "field_to_split": "train",
+    "stratify": true,
+    "split_fields": [
+      "train",
+      "valid"
+    ],
+    "split_proportions": [
+      0.9,
+      0.1
+    ]
+  },
+
+  "chainer": {
+    "in": ["texts"],
+    "in_y": ["true_labels"],
+
+    "pipe": [
+      {
+        "id": "classes_vocab",
+        "class_name": "simple_vocab",
+        "fit_on": [
+          "true_labels"
+        ],
+        "save_path": "{MODEL_PATH}/classes.dict",
+        "load_path": "{MODEL_PATH}/classes.dict",
+        "in": "true_labels",
+        "out": "true_label_ids"
+      },
+      {
+        "class_name": "StandaloneBERT",
+        "id": "model",
+        "in": ["texts"],
+        "in_y": ["true_label_ids"],
+        "out": ["pred_label_probs"],
+        "seq_len": 350,
+        "learning_rate": 1e-05,
+        "save_path": "{MODEL_PATH}/model",
+        "load_path": "{MODEL_PATH}/model",
+        "bert_models" : "{DOWNLOADS_PATH}/bert_models/multi_cased_L-12_H-768_A-12"
+      },
+      {
+        "in": "pred_label_probs",
+        "out": "pred_label_ids",
+        "class_name": "proba2labels",
+        "max_proba": true
+      },
+      {
+        "in": "pred_label_ids",
+        "out": "pred_labels",
+        "ref": "classes_vocab"
+      }
+    ],
+
+    "out": ["pred_labels"]
+  },
+
+  "train": {
+    "show_examples": false,
+    "batch_size": 8,
+    "epochs": 100,
+    "metrics": [
+      "sets_accuracy"
+    ],
+    "evaluation_targets": ["train","valid","test"],
+    "class_name": "nn_trainer",
+    "tensorboard_log_dir": "{MODEL_PATH}/",
+    "validation_patience": 5,
+    "validate_first": true,
+    "val_every_n_epochs": 1,
+    "log_every_n_epochs": 1
+  },
+
+  "metadata": {
+    "variables": {
+      "ROOT_PATH": "~/.deeppavlov",
+      "DOWNLOADS_PATH": "{ROOT_PATH}/downloads",
+      "MODELS_PATH": "{ROOT_PATH}/models",
+      "MODEL_PATH": "{MODELS_PATH}/StandaloneBERT"
+    },
+    "requirements": [
+      "{DEEPPAVLOV_PATH}/requirements/tf.txt"
+    ],
+    "labels": {},
+    "download": [
+      {
+        "url": "http://files.deeppavlov.ai/deeppavlov_data/bert/uncased_L-12_H-768_A-12.zip",
+        "subdir": "{DOWNLOADS_PATH}/bert_models"
+      }
+    ]
+  }
+}
+
+

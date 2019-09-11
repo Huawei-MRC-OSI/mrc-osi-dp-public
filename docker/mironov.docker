@@ -1,0 +1,53 @@
+FROM ufoym/deepo:all-jupyter
+COPY with_the_same_user.sh /install/with_the_same_user.sh
+
+COPY proxy-certificates.sh /install/proxy-certificates.sh
+RUN /bin/sh /install/proxy-certificates.sh
+
+RUN apt-get update && \
+    ln -fs /usr/share/zoneinfo/Europe/Moscow /etc/localtime && \
+    apt-get install -y tzdata && \
+    dpkg-reconfigure --frontend noninteractive tzdata && \
+    apt-get install -y sudo wget \
+                       libgl1-mesa-glx libqt5x11extras5 \
+                       net-tools netcat && \
+    apt-get install -y locales && \
+    locale-gen "en_US.UTF-8"
+
+RUN apt-get install -y openjdk-8-jdk
+COPY set_java_home.sh /install/set_java_home.sh
+RUN /bin/sh /install/set_java_home.sh
+
+COPY proxy-environment.sh /install/proxy-environment.sh
+RUN /bin/sh /install/proxy-environment.sh
+
+COPY install_mironov_env.sh /install/install_mironov_env.sh
+RUN /bin/sh /install/install_mironov_env.sh
+
+RUN pip3 install seaborn PyQT5 PySide2 \
+                 beautifultable tqdm \
+                 hypothesis pytest \
+                 seqeval sklearn \
+                 jsonpickle overrides \
+                 ipdb
+
+COPY install_coral.sh /install/install_coral.sh
+RUN /bin/sh /install/install_coral.sh
+
+COPY install_git_openssl.sh /install/install_git_openssl.sh
+RUN /bin/sh /install/install_git_openssl.sh
+
+COPY install_bazel.sh /install/install_bazel.sh
+RUN /bin/sh /install/install_bazel.sh
+
+COPY install_deeppavlov_deps.sh /install/install_deeppavlov_deps.sh
+RUN /bin/sh /install/install_deeppavlov_deps.sh
+
+RUN pip3 install tensorflow-gpu
+RUN pip3 install netron
+RUN pip3 install pyls pyls-mypy mypy
+
+RUN pip3 install -e git+https://github.com/CyberZHG/keras-radam#egg=keras-rectified-adam
+RUN pip3 install -e git+https://github.com/CyberZHG/keras-bert#egg=keras-bert
+
+RUN pip3 install nltk flasgger flask_cors pyopenssl telebot
