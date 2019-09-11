@@ -1,5 +1,5 @@
-DeepPavlov as a library
------------------------
+DeepPavlov as a training library
+--------------------------------
 
 In this repository we demonstrate how to re-use [DeepPavlov](https://deeppavlov.ai/)
 infrastructure for training custom NLP models.
@@ -7,14 +7,14 @@ infrastructure for training custom NLP models.
 Specifically, we wrap popular
 [CyberZHG/Keras-bert](https://github.com/CyberZHG/keras-bert) model with
 DeepPavlov dataset reader and train it using NN-trainer on [Imdb-Sentiment
-task](http://ai.stanford.edu/~amaas/data/sentiment/).
+task](http://ai.stanford.edu/~amaas/data/sentiment/).  No modification of DP
+source tree is required.
 
 In this example we show how to:
 
 * Use a custom third-party model with the DeepPavlov framework
-* Re-use of rich dataset collection of DeepPavlov
-* Limit the Model-framework interface down to a small maintainable API.
-* No modification of DP source tree is required
+* Re-use rich collection of dataset readers from DeepPavlov
+* Limit the Model-Framework interface up to a small maintainable API.
 
 _Note: we depend on unmerged PR <https://github.com/deepmipt/DeepPavlov/pull/962>
 which adds a task-specific dataset reader to the DeepPavlov. It doesn't affect
